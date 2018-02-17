@@ -5,9 +5,9 @@
 
 #include "credentials.h"
 
-fauxmoESP alexawifi;
+fauxmoESP fauxmo;
 
-#define TRANSMITTER_PIN 0
+#define TRANSMITTER_PIN 2
 
 ESPiLight rf(TRANSMITTER_PIN);
 
@@ -42,7 +42,7 @@ void wifiSetup() {
 }
 
 void anfrage(uint8_t device_id, const char * device_name, bool state) {
-  Serial.print("Gerät: "); Serial.println(device_name);
+  Serial.print("Enhed: "); Serial.println(device_name);
   Serial.print("Status: ");
 
   if (state) {
@@ -59,9 +59,9 @@ void anfrage(uint8_t device_id, const char * device_name, bool state) {
     delay(2000);
     }
 
-    else if(device_id == 2) { //Onkyo
+    else if(device_id == 2) { //Kaffe
     Serial.println("ON");
-    rf.send("quigg_gt1000", "{\"unit\":3,\"id\":5,\"on\":1}");
+    rf.send("nexa_switch", "{\"unit\":15,\"id\":3,\"on\":1}");
     delay(2000);
     }
 
@@ -87,9 +87,9 @@ void anfrage(uint8_t device_id, const char * device_name, bool state) {
     delay(2000);
     }
 
-    else if(device_id == 2) { //Onkyo
+    else if(device_id == 2) { //Kaffe
     Serial.println("OFF");
-    rf.send("quigg_gt1000", "{\"unit\":3,\"id\":5,\"off\":1}");
+    rf.send("nexa_switch", "{\"unit\":15,\"id\":3,\"off\":1}");
     delay(2000);
     }
 
@@ -103,16 +103,16 @@ void anfrage(uint8_t device_id, const char * device_name, bool state) {
 }
 
 
-void pluge(){
+void plugs(){
 
     //433MHZ
 
-    alexawifi.addDevice("Pavoni"); //ID 0
-    alexawifi.addDevice("Bose Station");//ID 1
-    alexawifi.addDevice("Onkyo"); //ID 2
-    alexawifi.addDevice("IQ Floor Light"); //ID 3
+    fauxmo.addDevice("Kaffe"); //ID 0
+    fauxmo.addDevice("Bose Station");//ID 1
+    fauxmo.addDevice("Pavoni"); //ID 2
+    fauxmo.addDevice("IQ Floor Light"); //ID 3
 
-    alexawifi.onMessage(anfrage);
+    fauxmo.onMessage(anfrage);
 }
 
 
@@ -122,7 +122,7 @@ void setup() {
     Serial.println("Når forbindelsen er oprettet, sig 'Alexa, turn on <plug>' eller turn off");
 
     wifiSetup();
-    pluge();
+    plugs();
 //////////////////////
     server.begin(); //Start serveren
 /////////////////////
@@ -132,7 +132,7 @@ void setup() {
 
 void loop() {
 
-  alexawifi.handle();
+  fauxmo.handle();
 
 //  Serial.println("Vent paa Alexa eller Webrequest");
 //  delay(500); //Debug
@@ -173,12 +173,11 @@ void loop() {
   client.println("<html>");                           //
                                                       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   webseite += "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=yes\">";                                                            //
-  webseite += "<link rel=\"apple-touch-icon\" href=\"\" />";                                                                //
   webseite += "<center><h1>Mine RF stikkontakter</h1>";                                                                                                                             //
                                                                                                                                                                                 // Button anlegen fuer Gerät 1
   webseite += "<p>Pavoni <a href=\"plug=0on\"><button>On</button></a>&nbsp;<a href=\"plug=0off\"><button>Off</button></a></p>";                                              // Button anlegen fuer Gerät 2
   webseite += "<p>Bose Station <a href=\"plug=1on\"><button>On</button></a>&nbsp;<a href=\"plug=1off\"><button>Off</button></a></p>";                                                 //
-  webseite += "<p>Onkyo <a href=\"plug=2on\"><button>On</button></a>&nbsp;<a href=\"plug=2off\"><button>Off</button></a></p>";                                              // Button anlegen fuer Gerät 2
+  webseite += "<p>Kaffe <a href=\"plug=2on\"><button>On</button></a>&nbsp;<a href=\"plug=2off\"><button>Off</button></a></p>";                                              // Button anlegen fuer Gerät 2
   webseite += "<p>IQ Floor Light <a href=\"plug=3on\"><button>On</button></a>&nbsp;<a href=\"plug=3off\"><button>Off</button></a></p>";                                                 //
                                                                                                                                                                                 //
 
@@ -219,14 +218,14 @@ void loop() {
                                                                                                                                                                                 //
   if (request.indexOf("/plug=2on") != -1)  {                                                                                                                                  // Anfrage prüfen für AN
   webID = 2;                                                                                                                                                                    //
-  dName = "Onkyo";                                                                                                                                                          //
+  dName = "Kaffe";                                                                                                                                                          //
   webStatus = true;                                                                                                                                                             //
   anfrage(webID, dName, webStatus);                                                                                                                                             // Anfrage absenden
   }                                                                                                                                                                             //
                                                                                                                                                                                 //
   if (request.indexOf("/plug=2off") != -1)  {                                                                                                                                 // Anfrage prüfen für AUS
   webID = 2;                                                                                                                                                                    //
-  dName = "Onkyo";                                                                                                                                                          //
+  dName = "Kaffe";                                                                                                                                                          //
   webStatus = false;                                                                                                                                                            //
   anfrage(webID, dName, webStatus);                                                                                                                                             //
   }                                                                                                                                                                             //
